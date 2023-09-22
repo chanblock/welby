@@ -1,18 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useContext } from 'react';
 import {
   CardElement,
   useStripe,
   useElements,
 } from '@stripe/react-stripe-js';
-import { Spinner, Alert,Button } from "react-bootstrap";
-import { getUser,paymentSubscription,updateHadSuccessfulSubscription } from "../../api";
-
+import { Spinner, Alert,Button,Table} from "react-bootstrap";
+import { getUser,paymentSubscription,updateHadSuccessfulSubscription,UpdateFieldUser } from "../../api";
+import { SubscriptionContext } from '../../context/SubscriptionContext';
 import "../../styles/PaymentPage.css";
-import { Link, useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
+import Select from 'react-select';
 
 const PaymentPage = () => {
   const navigate = useNavigate();
-
+  const { handleGetSubscription } = useContext(SubscriptionContext);
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -23,12 +24,19 @@ const PaymentPage = () => {
   const [clientSecret, setClientSecret]= useState('');
   const [subscriptionId, setSubscriptionId]= useState('');
 
+  const [selectedPlan, setSelectedPlan] = useState({ value: 'month', label: 'Basic Plan $24/month' });
+  const planOptions = [
+    { value: 'month', label: 'Basic Plan $24/month' },
+    { value: 'year', label: 'Annual Plan $264/year' }
+  ];
 
   //  const to alert
   const [submitting, setSubmitting] = useState(false);
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("info");
+
+
   const showAlert = (message, type = "info") => {
     setAlertMessage(message);
     setAlertType(type); // Set the alert type
@@ -63,46 +71,55 @@ const PaymentPage = () => {
     e.preventDefault();
     setSubmitting(true);
     try {
-    const data= await paymentSubscription(localStorage.getItem("token"),email,name);
-   
-    setClientSecret(data.subscription.clientSecret)
-    setSubscriptionId(data.subscription.subscriptionId)
-    const cardElement = elements.getElement(CardElement);
- 
-    // Use card Element to tokenize payment details
-    let { error, paymentIntent } = await stripe.confirmCardPayment(data.subscription.clientSecret, {
-      payment_method: {
-        card: cardElement,
-        billing_details: {
-          name: name,
-        }
-      }
-    });
-
-    if(error) {
-      // show error and collect new card details.
-      setMessages(error.message);
-      console.log(error)
-      setSubmitting(false);
-      // if payments is canceled find user and delete subscription in db and stripe(customer/subscription)
+    const updatedFieldUser= await UpdateFieldUser(localStorage.getItem("token"),"subscription_type",selectedPlan);
+    if (updatedFieldUser){
+        const data= await paymentSubscription(localStorage.getItem("token"),email,name);
       
-    }else{
-      setSubmitting(false);
-      setPaymentIntent(paymentIntent);
-      if(paymentIntent && paymentIntent.status === 'succeeded') {
+        setClientSecret(data.subscription.clientSecret)
+        setSubscriptionId(data.subscription.subscriptionId)
+        const cardElement = elements.getElement(CardElement);
+    
+        // Use card Element to tokenize payment details
+        let { error, paymentIntent } = await stripe.confirmCardPayment(data.subscription.clientSecret, {
+          payment_method: {
+            card: cardElement,
+            billing_details: {
+              name: name,
+            }
+          }
+        });
+
+        if(error) {
+          // show error and collect new card details.
+          setMessages(error.message);
+          console.log(error)
           setSubmitting(false);
-          showAlert('Successful subscription.', "info");
-          await updateHadSuccessfulSubscription(localStorage.getItem("token"), true);
+          // if payments is canceled find user and delete subscription in db and stripe(customer/subscription)
+          
+        }else{
+          setSubmitting(false);
+          setPaymentIntent(paymentIntent);
+          if(paymentIntent && paymentIntent.status === 'succeeded') {
+              setSubmitting(false);
+              await updateHadSuccessfulSubscription(localStorage.getItem("token"), true);
+              await handleGetSubscription(subscriptionId);
+              showAlert("Your payment has been successful, for more details check your subscription profile")
+              setTimeout(() => {
+                navigate('/home');
+            }, 3000);
+
+            }
 
         }
+    }else{
+      showAlert("There was a problem in the subscription processit had in the suscribe")
 
     }
-
   } catch (error) {
     console.error(error);
     showAlert("Failed to send payment. Please try again later.", "danger");
     setSubmitting(false);
-}
+  }
 
   };
 
@@ -114,32 +131,70 @@ const PaymentPage = () => {
     <div className="subscription-page">
      
       <div className="subscription-details-container">
-        <h2>Subscription Details</h2>
-        
-        <hr></hr>
-        <div className="subscription-details">
-          <div><strong>Hi, </strong> {user && user.username}</div>
-                <p style={{textAlign: "justify", lineHeight: "1.5"}}>
-              Our paid subscription is a door to an enriching and personalized experience. Here's what it covers:
+        <h2><strong>Hi,</strong> {user && user.username} select the ideal plan for you</h2>
+        <br></br>
+        <div >
+                <p >
+                Our paid subscription is a door to an enriching and personalized experience. 
+                
             <br/>
             <br/>
-            <strong>Child Care Expert:</strong> Unlimited access to the different types of reports and access to them at any time.
+            <strong>&#10003; Child Care Expert:</strong> Unlimited access to the different types of reports and access to them at any time.
             <br/>
-            <strong>Ask me anything (Chat):</strong> Subscribers will have direct access to a real-time artificial intelligence chat channel.
-            <br/> 
-            <strong>How to do in Australia:</strong> This feature will remain accessible even without a subscription.
+            <strong>&#10003; Ask me anything (Chat):</strong> Subscribers will have direct access to a real-time artificial intelligence chat channel.
+       
             <br/>
+            <strong>&#10003; Personalized advice:</strong> You will receive specialized and personalized advice, adapted to the daily challenges of child care..
+
             <br/>
-            By subscribing, you are not only investing in a quality experience, but you are also supporting our work to continue to provide exceptional service. We look forward to welcoming you to our community of subscribers!
 
           </p>
-        <div><p className="lead"><strong>Get a <mark>45%</mark> discount on the subscription for your first time</strong></p></div>
           
         </div>
+        <br />
+        <Table   className="myTable">
+      
+      <tbody>
+      <tr>
+          <td colSpan={2}></td>
+          <td className="headerCell text-center">Plan basic</td>
+          <td className="headerCell text-center">Plan Premium</td>
 
-        <div><Button onClick={handleGoBack} className="mt-2 d-none d-md-inline-block" variant="light">
+
+        </tr>
+        <tr>
+          <td colSpan={2}>Price</td>
+          <td className='text-center'>$24 month</td>
+          <td className='text-center'>$264 Annual</td>
+
+
+        </tr>
+        <tr>
+        <td colSpan={2}>Child Care Expert</td>
+
+          <td className='text-center'><strong>&#10003;</strong></td>
+          <td className='text-center'><strong>&#10003;</strong></td>
+        </tr>
+        <tr>
+        <td colSpan={2}>Ask me anything (Chat)</td>
+          <td className='text-center'><strong>&#10003;</strong></td>
+          <td className='text-center'><strong>&#10003;</strong></td>
+
+        </tr>
+        
+        <tr>
+        <td colSpan={2}>Personalized advice</td>
+        <td className='text-center'><strong>&#10007;</strong></td>
+          <td className='text-center'><strong>&#10003;</strong></td>
+        </tr>
+      </tbody>
+    </Table>
+
+        <div>
+              <Button onClick={handleGoBack} className="mt-2 d-none d-md-inline-block" variant="light">
                 Go Back
-              </Button></div>
+              </Button>
+        </div>
 
       <br></br>
       </div>
@@ -152,6 +207,15 @@ const PaymentPage = () => {
           </Alert>
         )}
         <form onSubmit={handleSubmit}>
+        <label>
+            <small>Subscription Plan</small>
+          </label>
+          <Select 
+            options={planOptions} 
+            value={selectedPlan}
+            onChange={setSelectedPlan} 
+            
+          />
         <label><small> Email</small> </label>
         <input type="email" id="email" className="form-input" value={email} onChange={(e) => setEmail(e.target.value)} />
         {emailError && <div className="email-error">{emailError}</div>}
@@ -167,7 +231,17 @@ const PaymentPage = () => {
           </label>
           
           <div className="stripe-card-element">
-          <CardElement  />
+          <CardElement 
+           options={{
+            style: {
+              base: {
+                fontSize: '16px',
+                fontFamily: 'Arial, sans-serif',
+              },
+            },
+            hidePostalCode: true, // Omitir el campo ZIP
+          }}
+          />
           </div>
           
           <button className="subscribe-button" type="submit" disabled={submitting}>

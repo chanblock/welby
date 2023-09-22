@@ -2,25 +2,11 @@ html, body, #root {
     height: 100%;
 } 
 
-body {
-  padding-top: 70px; /* Ajusta este valor según la altura de tu navbar */
-}
-
 
 .home-container {
-  max-width: 100vw;
   display: flex;
     flex-direction: column;
     min-height: 100vh;
-    box-sizing: border-box;
-    overflow-x: hidden;
-}
-
-@media (max-width: 576px) {
-  .home-container  {
-      width: 100%; /* Hacer que las tarjetas ocupen el ancho completo en móviles */
-      padding: 10px; /* Ajustar el padding si es necesario */
-  }
 }
 .main-view {
     height: 100%;
@@ -106,24 +92,9 @@ body {
   }
   
   .report-title {
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
     font-size: 2rem;
   }
-
-
-  .container .card {
-    width: 100%;
-    flex-grow: 0;      /* Evita que el elemento crezca más allá de su altura de contenido */
-    flex-shrink: 1;    /* Permite que el elemento se encoja si es necesario */
-    flex-basis: auto;  /* Establece la base a su altura de contenido */
-  }
-  
-
-  .button-container {
-    display: flex;
-    justify-content: space-between; /* Esto separará los botones, ocupando todo el espacio disponible entre ellos. */
-}
-
   
   textarea.report-content {
     font-family: 'Arial', sans-serif;
@@ -188,13 +159,12 @@ body {
   color: #ffffff;            /* Color de texto blanco */
   border: none;              /* Sin bordes */
 }
-
-.button-container {
-  display: flex;
-  justify-content: space-between; /* Esto separará los botones, ocupando todo el espacio disponible entre ellos. */
-}
-
-.childListContainer {
-  min-height: 500px;
-
+@media (max-width: 767.98px) {
+    .report-card {
+        margin: 1rem 0;
+        padding: 1rem;
+    }
+    .report-title {
+        font-size: 1.5rem;
+    }
 }

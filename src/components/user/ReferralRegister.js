@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation,useParams } from 'react-router-dom';
 import {  Spinner,Alert } from 'react-bootstrap';
-import '../../styles/Auth.css';
-import { updateReferralDiscount,getUserDiscount,deleteUserByEmail, registerUser,paymentSubscription,updateHadSuccessfulSubscription } from '../../api';
+import "../../styles/PaymentPage.css";
+import AsyncSelect from 'react-select/async';
+import { updateReferralDiscount,getUserDiscount,deleteUserByEmail, registerUser,paymentSubscription,
+    updateHadSuccessfulSubscription,getListChildCare } from '../../api';
 import {
     CardElement,
     useStripe,
@@ -25,6 +27,9 @@ function ReferralRegister() {
     const [clientSecret, setClientSecret]= useState('');
     const [subscriptionId, setSubscriptionId]= useState('');
 
+    // const to select childcare
+    const [childcareWorker, setChildcareWorker] = useState(false);
+    const [childcare, setChildcare] = useState(null);
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -34,6 +39,12 @@ function ReferralRegister() {
     const [alertMessage, setAlertMessage] = useState("");
     const [alertType, setAlertType] = useState("info");
     
+    const loadOptions = async (inputValue) => {
+        const getChildCare = await getListChildCare(inputValue)
+        // Transforma los datos en el formato que react-select espera
+        return getChildCare.map(childcare => ({ value: childcare.ServiceApprovalNumber, label: childcare.ServiceName }));
+      };
+     
     const showAlert = (message, type = "info") => {
         setAlertMessage(message);
         setAlertType(type); // Set the alert type
@@ -57,17 +68,19 @@ function ReferralRegister() {
         const checkbox = event.target.userType;
         const userType = checkbox.checked ? checkbox.value : "usergeneral";
         const old_user_token = referral;
-        console.log("old_user_token",old_user_token)
         const referred_user = true;
+        const subscription_type = "month";
+        let childcareList = []; // Valor predeterminado vacío
+        if (childcare !== null) {
+            childcareList = [childcare];
+        }
         
         try {
             // Create a new customer and subscription
-            const idNewRegister = await registerUser(username, email, password, phone,userType,referred_user);
+            const idNewRegister = await registerUser(username, email, password, phone,userType,referred_user,subscription_type,childcareList);
             const createSubcription= await paymentSubscription(idNewRegister['token'],email,nameCard);
             setClientSecret(createSubcription.subscription.clientSecret)
-            console.log("createSubcription",createSubcription.subscription.clientSecret)
             setSubscriptionId(createSubcription.subscription.subscriptionId)
-            console.log("createSubcription",createSubcription.subscription.subscriptionId)
             const cardElement = elements.getElement(CardElement);
             // Use card Element to tokenize payment details
             let { error, paymentIntent } = await stripe.confirmCardPayment(createSubcription.subscription.clientSecret, {
@@ -81,7 +94,7 @@ function ReferralRegister() {
             if(error) {
                 // show error and collect new card details.
                 setLoading(false);
-                showAlert(error.message, "danger")
+                showAlert("error en cofirmCardPayments"+ error.message, "danger")
                 const response = await deleteUserByEmail(email);
 
                 console.log("error in register card ")
@@ -90,11 +103,10 @@ function ReferralRegister() {
             }else{
                 setPaymentIntent(paymentIntent);
                 if(paymentIntent && paymentIntent.status === 'succeeded') {
-                    console.log('Payment successful!');
-                    await updateHadSuccessfulSubscription(localStorage.getItem("token"), true);
+                    await updateHadSuccessfulSubscription(idNewRegister['token'], true);
                     await updateReferralDiscount(old_user_token);
                     setLoading(false);
-                    showAlert("Register successful!");
+                    showAlert("Your registration and payment has been successful. You got a 90% discount for two months!");
                     setTimeout(() => {
                         navigate('/auth');
                     }, 3000);
@@ -117,9 +129,37 @@ function ReferralRegister() {
     };
 
     return (
-        <div className="auth-container-2">
-            
-            <div className=" auth-card-2">
+        <div className="subscription-page">
+              <div className="subscription-details-container">
+        <h2>Subscription Details</h2>
+        
+        <hr></hr>
+        <div className="subscription-details">
+          <div><strong>Hi, </strong> </div>
+            <p >
+                Our paid subscription is a door to an enriching and personalized experience. 
+                For only <strong>$24</strong>, you will have access to a wide range of exclusive benefits:
+                <br/>
+                <br/>
+                <strong>Child Care Expert:</strong> Unlimited access to the different types of reports and access to them at any time.
+                <br/>
+                <strong>Ask me anything (Chat):</strong> Subscribers will have direct access to a real-time artificial intelligence chat channel.
+                <br/> 
+                <strong>How to do in Australia:</strong> This feature will remain accessible even without a subscription.
+                <br/>
+                <br/>
+                By subscribing, you are not only investing in a quality experience, but you are also supporting our work to continue to provide exceptional service. We look forward to welcoming you to our community of subscribers!
+
+          </p>
+          <div><p className="lead"><strong>Get a <mark>90%</mark> discount on the subscription for your first time</strong></p></div>
+          
+        </div>
+
+      
+
+      <br></br>
+      </div>
+            <div className="payment-form-container2">
                 
                 <h2>Sign up</h2>
                 <p className="lead alert alert-info" >
@@ -188,6 +228,8 @@ function ReferralRegister() {
                         name="userType"
                         value="childcareWorker"
                         className="big-checkbox"
+                        onChange={(e) => setChildcareWorker(e.target.checked)}
+
                     />
                     </div>
                     <div className="col-11">
@@ -195,6 +237,17 @@ function ReferralRegister() {
                     </div>
               
                 </div>
+
+                {childcareWorker && (
+                      <div className="col-12">
+                          <label htmlFor="childcare">Select your Childcare:</label>
+                          <AsyncSelect 
+                          id="childcare"
+                          loadOptions={loadOptions}
+                          onChange={selectedOption => setChildcare(selectedOption)}
+                          />
+                      </div>
+              )}
 
                 <div className="col-12">
 
@@ -217,7 +270,17 @@ function ReferralRegister() {
                 <div className="col-12">
                 <div className="stripe-card-element">
                     
-                    <CardElement  />
+                    <CardElement 
+                     options={{
+                        style: {
+                          base: {
+                            fontSize: '16px',
+                            fontFamily: 'Arial, sans-serif',
+                          },
+                        },
+                        hidePostalCode: true, // Omitir el campo ZIP
+                      }}
+                    />
                 </div>
                 <p className="disclaimer">
                     If you confirm the subscription, you will allow this payment and future payments to be charged to your card in accordance with the stipulated conditions. Payments made on the web are made through Stripe.

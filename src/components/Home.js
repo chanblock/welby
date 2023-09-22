@@ -9,7 +9,7 @@ import CardGrid from "./CardGrid";
 import { checkSubscription } from "../api";
 
 const Home = () => {
-  console.log("funcion home")
+    console.log("dentro del home fullacces",localStorage.getItem("fullAccess"));
     const [fullAccess, setFullAccess] = useState(localStorage.getItem("fullAccess") === "true");
     const updateFullAccessStatus = async () => {
         try {
@@ -29,7 +29,6 @@ const Home = () => {
             }
          }
           // Asegúrate de actualizar el estado de fullAccess después de cambiar el valor en localStorage
-      
         } catch (error) {
           console.error('Failed to update full access status:', error);
         }
@@ -38,11 +37,10 @@ const Home = () => {
       useEffect(() => {
         // Verifica si el usuario está autenticado antes de llamar a 'updateFullAccessStatus'
         if (localStorage.getItem("token")) {
-          console.log("verificacion de usuario logueado true")
           updateFullAccessStatus();
         }
-        }, []);
-        useEffect(() => {
+      }, []);
+      useEffect(() => {
           const handleStorageChange = (e) => {
             if (e.key === 'fullAccess') {
               setFullAccess(e.newValue === "true");
@@ -55,9 +53,8 @@ const Home = () => {
           return () => {
             window.removeEventListener('storage', handleStorageChange);
           };
-        }, []);
+      }, []);
 
-    // const fullAccess = localStorage.getItem("fullAccess") === "true";
     return (
         <div >
             <CardGrid>

@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Navbar from "./components/Navbar";
 import Chat from "./components/Chat";
-import Home from "./components/Home";
 import ReportView from "./components/report/ReportView";
 import Auth from "./components/user/Auth";
 import ToDoAustralia from "./components/ToDoAustralia";
@@ -15,16 +14,24 @@ import SelectReportToReflection from "./components/report/SelectReportToReflecti
 import ResetPassword from "./components/user/ResetPassword";
 import Subscription from "./components/user/Subscription";
 import PaymentPage from "./components/user/PaymentPage";
+import Welcome from "./components/user/Welcome";
+import Profile from "./components/user/Profile";
+import UpdateProfile from "./components/user/UpdateProfile";
+import RegisterBasic from "./components/user/RegisterBasic";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import ReferralRegister from "./components/user/ReferralRegister";
 import ChildList from "./components/child/ChildList";
+import { SubscriptionProvider } from './context/SubscriptionContext';
 import { ChildsProvider } from "./components/childcomponents/ChildsProvider";
+import Home1 from "./components/Home1";
+import Footer from "./components/Footer";
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isfullAccess, setFullAccess] = useState(false); 
   const [isUserType, setUserType] = useState(""); 
   const [isLoading, setIsLoading] = useState(true);
+ 
 
   // stripe pasarela de pago
   const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
@@ -36,7 +43,6 @@ function App() {
     setUserType(userType);
     setIsAuthenticated(token !== null);
     setIsLoading(false);
-  
 
     
   }, []);
@@ -58,20 +64,21 @@ function App() {
 
   return (
     <Elements stripe={stripePromise} options={{ locale: 'en-AU' }}>
-      <Router basename="/writewiseweb">
+      <Router basename="/Welby">
         <div className="App">
         <ChildsProvider>
           <Navbar isAuthenticated={isAuthenticated} updateAuth={updateAuth} />
           </ChildsProvider>
+        <SubscriptionProvider>
+          
             <Routes>
-              <Route path="/" element={<RequireAuth isAuthenticated={isAuthenticated}><Home /></RequireAuth>} />
-              {/* Control de acceso a las rutas en base a userType y isfullAccess */}
-                {isfullAccess && isUserType === "usergeneral" && 
-                <>
-                  <Route path="/chat" element={<RequireAuth isAuthenticated={isAuthenticated}><Chat /></RequireAuth>} />
-                  <Route path="/to_do_australia" element={<RequireAuth isAuthenticated={isAuthenticated}><ToDoAustralia /></RequireAuth>} />
-                  </>
-}             
+              {/* <Route path="/" element={<RequireAuth isAuthenticated={isAuthenticated}><Home /></RequireAuth>} /> */}
+              <Route path="/" element={<Welcome />} />
+              <Route path="/home" element={<RequireAuth isAuthenticated={isAuthenticated}><Home1 /></RequireAuth>} />
+              <Route path="/profile" element={<RequireAuth isAuthenticated={isAuthenticated}><Profile /></RequireAuth>} />
+              <Route path="/updateProfile" element={<RequireAuth isAuthenticated={isAuthenticated}><UpdateProfile /></RequireAuth>} />
+
+            
               {isfullAccess && isUserType === "childcareWorker" &&
                   <>
                   <Route path="/chat" element={<RequireAuth isAuthenticated={isAuthenticated}><Chat /></RequireAuth>} />
@@ -86,22 +93,27 @@ function App() {
                     </RequireAuth>} />
                   </>
                } 
-              {!isfullAccess  &&
-                  <Route path="/to_do_australia" element={<RequireAuth isAuthenticated={isAuthenticated}><ToDoAustralia /></RequireAuth>} />
-
-              } 
+              
               <Route path="/report" element={<RequireAuth isAuthenticated={isAuthenticated}><ReportView /></RequireAuth>} />
               <Route path="/auth"  element={<Auth updateAuth={updateAuth} />} />
               <Route path="/reset-password/:token" element={<ResetPassword />} />
+              
               <Route path="/subscription" element={<Subscription />} />
+              
               <Route path="/payment-page" element={<PaymentPage />} />
+              <Route path="/multi-prom" element={<Welcome />} />
               <Route path="/referral-link/:referralId" element={<ReferralRegister />} />
+              <Route path="/register-basic" element={<RegisterBasic />} />
+              <Route path="/register-premium" element={<RegisterBasic />} />
 
+            
             </Routes> 
-          
+        <Footer />
+
+            </SubscriptionProvider>
         </div>
       </Router>
-    // </Elements>
+    </Elements>
   );
 }
 

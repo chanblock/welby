@@ -6,8 +6,14 @@
     padding: 4%;
     box-sizing: border-box;
   }
+
+.subscription-details-container{
+  flex-direction: row;  
+  gap: 0px;  
+  box-sizing: border-box;
+}
   
-  .cardContainer, .payment-form-container  {
+  .cardContainer, .payment-form-container,.payment-form-container2  {
     background-color: #ffffff;
     border-radius: 4px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
@@ -36,6 +42,11 @@
   .payment-form-container {
     width: 100%;
     max-width: 435px;
+    margin: 0 200;
+  }
+  .payment-form-container2 {
+    width: 100%;
+    max-width: 650px;
     margin: 0 200;
   }
   
@@ -116,4 +127,33 @@
     padding: 1em; /* Espacio alrededor del contenido */
     box-sizing: border-box; /* Incluye el padding y el borde en el tamaño total del contenedor */
   }
+
+  .subscription-details p {
+    text-align: justify;
+    line-height: 1.5;
+    font-size: 16px;
+  }
+
+  .text-center {
+    text-align: center;
+  }
+
+  .myTable {
+    border: none;
+  }
+  
+  .myTable tr {
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  .myTable .headerCell {
+    background-color: blue;
+    color: white;
+    border-right: 1px solid white;
+  }
+  
+  .myTable .headerCell:last-child {
+    border-right: none;
+  }
+  
   

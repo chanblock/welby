@@ -3,10 +3,11 @@ import { useLocation,useNavigate } from 'react-router-dom';
 import styles from '../../styles/ReportList.module.css';
 import {Button, Modal, Spinner,Form,Col } from 'react-bootstrap';
 import "../../styles/Home.css";
-import { submitGetHistoricalReport,submitCreateWord } from '../../api';
+import { submitGetHistoricalReport,submitCreateWord,deleteReport } from '../../api';
 const ReportList = () => {
     const location = useLocation();
     const reports = location.state?.reports || [];
+    const sortedReports = reports.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
     const [filter, setFilter] = useState('');
     const [submitting, setSubmitting] = useState(false);
     // const modal alert
@@ -22,6 +23,7 @@ const ReportList = () => {
     const handleCloseModal = () => {
         setShowModal(false);
       };
+
     const handleShowModal = (messageModal, linkModal = "") => {
         setSubmitting(false);
         setMessageModal(messageModal);
@@ -49,7 +51,7 @@ const ReportList = () => {
       
    
 
-    const filteredReports = reports.filter(report => {
+    const filteredReports = sortedReports.filter(report => {
         const childName = report.child && report.child.child_name;
         const isNotAvailable = value => value === "Not available";
         return isNotAvailable(childName) || (filter.trim() === '' || (childName && childName.toLowerCase().includes(filter.toLowerCase())));
@@ -93,6 +95,26 @@ const ReportList = () => {
         }
     } 
 
+    const handleDeleteReport = async(reportId) =>{
+        try {
+            const deletedReport = await deleteReport(reportId);
+            if (deletedReport.error) {
+                console.log(deletedReport.error)
+            } else {
+                console.log("deletedReport",deletedReport)
+                 // Actualizar la lista de reportes
+                const updatedReports = reports.filter(report => report._id !== reportId);
+                navigate(location.pathname, { state: { reports: updatedReports } });
+                // Mostrar un mensaje informativo
+                handleShowModal("Report deleted successfully!");
+                // handleRedirect('Historical Report', data['get_report']['type_report'],data['get_report']['timestamp'],data['get_report']['report']);
+            }
+        } catch (error) {
+            console.error(error);
+          
+        }
+    }
+
      // Function to handle checkbox click
     const handleCheckboxChange = (_id, isChecked) => {
         if (isChecked) {
@@ -124,6 +146,7 @@ const ReportList = () => {
             handleShowModal("Link to download report:", data.message);
         }
     };
+
     return (
         <div>
             <br></br>
@@ -147,7 +170,7 @@ const ReportList = () => {
 
            <div className={styles['title']}>
                 {/* <h1>Historical  {reports.length > 0 ? formatTitle(reports[0].type_report) : ''}</h1> */}
-                <h1>Historical {reports.length > 0 ? formatTitle(reports[0].type_report) : 'No reports available'} </h1>
+                <h1>Historical  {reports.length > 0 ? formatTitle(reports[0].type_report) : 'No reports available'} </h1>
             </div>
             <Col  className="d-flex justify-content-center">
            
@@ -206,13 +229,34 @@ const ReportList = () => {
                                   )}  
                                 <h3><p className="display-6"><em>{new Date(timestamp).toLocaleString()}</em></p></h3>
                                 <p>
-                                    {reports[0].type_report === "descriptions_report" && (
-                                        <><em>Name:</em><strong> {child_name}</strong><br></br><em>Observations:</em>{goalObservations}</> 
-                                    )}
-                                    <br></br>
+                                   
+                                {/* <em>Name:</em><strong> {child_name}</strong><br></br>
+                                {reports[0].type_report === "descriptions_report" && (
+                                        <><em>Observations:</em>{goalObservations}<br></br></> 
+                                    )} */}
+                                { 
+                                    ["descriptions_report", "follow_up", "summative_assessment", "goal_report"].includes(reports[0].type_report) && (
+                                        <>
+                                            <em>Name:</em><strong> {child_name}</strong><br/>
+                                            {reports[0].type_report === "descriptions_report" && <><em>Observations:</em>{goalObservations}<br/></>}
+                                            {/* Puedes agregar más condiciones para otros tipos de reportes aquí si es necesario */}
+                                        </>
+                                    )
+                                }
                                 <em>Report: </em> {truncateReport(reportContent)}</p>
-                                <button onClick={() => handleGetReport(_id)} className="mt-2 d-none d-md-inline-block">Show more</button>
-                                <button onClick={() => handleGetReport(_id)} className="mt-2 ml-2 d-inline-block d-md-none">Show more</button>
+                              
+                                <div className='row' style={{ justifyContent: 'flex-start' }}>
+                                    <div style={{ display: 'inline-block' }}>
+                                        <button onClick={() => handleGetReport(_id)} className="btn-sm mt-2 d-none d-md-inline-block button-space">Show more</button>
+                                        <button onClick={() => handleDeleteReport(_id)} style={{ backgroundColor: '#8c8585', color: '#ffffff' }} className="btn-sm mt-2 ml-2 d-none d-md-inline-block ">Delete Report</button>
+                                    </div>
+                                
+                                        <button onClick={() => handleGetReport(_id)} className="btn-sm mt-2 ml-2 d-inline-block d-md-none">Show more</button>
+                                        <button onClick={() => handleDeleteReport(_id)} style={{ backgroundColor: '#8c8585', color: '#ffffff' }} className="btn-sm mt-2 ml-2 d-inline-block d-md-none ">Delete Report</button>
+                                
+                                </div>
+
+                                
                             </div>
                         );
                     }))}

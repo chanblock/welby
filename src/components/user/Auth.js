@@ -1,14 +1,19 @@
 import React, { useState } from 'react';
 import "../../styles/Auth.css";
 import { Spinner, Alert,Modal,Button,Form } from "react-bootstrap";
-import { registerUser, loginUser, requestPasswordReset,sendDiscountEmail } from '../../api'; // Import the submitDailyReport function
-import { useNavigate } from 'react-router-dom';
+import { registerUser, loginUser, requestPasswordReset,sendDiscountEmail,getListChildCare } from '../../api'; // Import the submitDailyReport function
+import { useLocation,useNavigate } from 'react-router-dom';
+import AsyncSelect from 'react-select/async';
+
+
 
 
 
 
 const Auth = (props) => {
-  const [isLogin, setIsLogin] = useState(true);
+  const location = useLocation();
+  const initialIsLogin = location.state?.isLogin ?? true;
+  const [isLogin, setIsLogin] = useState(initialIsLogin);  // const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   
@@ -23,6 +28,11 @@ const Auth = (props) => {
 
   // const to reset password
   const [isReset, setIsReset] = useState(false);
+
+  // const to select childcare
+  const [childcareWorker, setChildcareWorker] = useState(false);
+  const [childcare, setChildcare] = useState(null);
+
 
   // const para redirigir a una url 
   const navigate = useNavigate();
@@ -39,7 +49,7 @@ const Auth = (props) => {
 
   const handleCloseModal = () => {
     setShowModal(false);
-    navigate('/');
+    navigate('/home');
   
   };
   const handleShowModal = (messageModal) => {
@@ -57,7 +67,11 @@ const Auth = (props) => {
     }
   };
 
-
+  const loadOptions = async (inputValue) => {
+    const getChildCare = await getListChildCare(inputValue)
+    // Transforma los datos en el formato que react-select espera
+    return getChildCare.map(childcare => ({ value: childcare.ServiceApprovalNumber, label: childcare.ServiceName }));
+  };
  
 
   const handleResetRequest = async (event) => {
@@ -75,6 +89,7 @@ const Auth = (props) => {
     }
   };
 
+
   const handleLogin = async (email, password) => {
    
     try {
@@ -84,44 +99,88 @@ const Auth = (props) => {
       localStorage.setItem('token', data.token);
       localStorage.setItem("username", data.username);
       localStorage.setItem("userType", data.userType);
-      console.log(data, "data")
+      localStorage.setItem("subscription",data.subscription);
+      localStorage.setItem("subscriptionType",data.subscription_type);
+      if(data.subscription){
+        localStorage.setItem("subscription_id", data.data_subscription.subscriptionId);
+      }
+
       // Verifica si el usuario está dentro de los 30 días de acceso gratuito
+      const OLD_USER_DEADLINE = new Date('2023-09-01');
       const withinFreeTrial = () => {
         const createdDate = new Date(data.created_at);
-        console.log(createdDate)
         const today = new Date();
-        const daysSinceCreation = Math.ceil((today - createdDate) / (1000 * 60 * 60 * 24));
-        console.log(daysSinceCreation, "dias desde su creacion")
-        if( 0 <=(30-daysSinceCreation) &&(30-daysSinceCreation) <= 5){
-          handleShowModal(`Your free trial will expire in ${30-daysSinceCreation} days. Get a 45% discount on the subscription for your first time`, "info");
-        }
-        if ((30-daysSinceCreation) == -1){
-        }
-        return 30-daysSinceCreation;
-      };
- 
-      if (data.subscription === true){
-        console.log("days data.subscription",data)
+        const isOldUser = createdDate < OLD_USER_DEADLINE;
+        console.log("olduser", isOldUser)
+        // const daysSinceCreation = Math.ceil((today - createdDate) / (1000 * 60 * 60 * 24));
+        // const freeTrialDays = isOldUser ? 120 : 30; 
+        // console.log("days since creation: ", daysSinceCreation)
+        // console.log("free trial days:", freeTrialDays)
 
+        // //*******codigo anterior viejo***** 
+        // // if( 0 <=(30-daysSinceCreation) &&(30-daysSinceCreation) <= 5){
+        // //   handleShowModal(`Your free trial will expire in ${30-daysSinceCreation} days. Get a 45% discount on the subscription for your first time`, "info");
+        // // }
+        // // if ((30-daysSinceCreation) == -1){
+        // // }
+        // // return 30-daysSinceCreation;
+      
+        // if( 0 <=(freeTrialDays-daysSinceCreation) &&(freeTrialDays-daysSinceCreation) <= 5){
+        //   handleShowModal(`Your free trial will expire in ${freeTrialDays-daysSinceCreation} days. Get a 45% discount on the subscription for your first time`, "info");
+        // }
+
+        // console.log(freeTrialDays-daysSinceCreation)
+        // return freeTrialDays-daysSinceCreation;
+
+        let daysLeft;
+        if (isOldUser) {
+          const endDateForOldUser = new Date('2023-12-30');
+          daysLeft = Math.ceil((endDateForOldUser - today) / (1000 * 60 * 60 * 24));
+        } else {
+          const daysSinceCreation = Math.ceil((today - createdDate) / (1000 * 60 * 60 * 24));
+          const freeTrialDays = 30; 
+          daysLeft = freeTrialDays - daysSinceCreation;
+        }
+      
+        console.log("days left: ", daysLeft)
+      
+        if (0 <= daysLeft && daysLeft <= 5) {
+          handleShowModal(`Your free trial will expire in ${daysLeft} days. Get a 45% discount on the subscription for your first time`, "info");
+        }
+      
+        return daysLeft;
+
+      };
+
+      const isAnnualSubscription = data.subscriptionType === 'year';
+      if (data.subscription === true){
+          console.log(data.subscription)
         if (data.subscription_end_date) {
+          console.log("end subscription:", data.subscription_end_date)
           const today = new Date();
           const subscriptionEndDate = new Date(data.subscription_end_date);
-          const days = Math.ceil((subscriptionEndDate - today) / (1000 * 60 * 60 * 24));
-          if (days > 5){
+          console.log(subscriptionEndDate)
+          const days = Math.ceil((subscriptionEndDate - today) / (1000 * 60 * 60 * 24)) * (isAnnualSubscription ? 12 : 1);
+          console.log("days",days)
+          if (days > 5 * (isAnnualSubscription ? 12 : 1)){
             localStorage.setItem("fullAccess", true);
             setLoading(false);
             props.updateAuth(true,data.userType,true);
-            navigate('/');
+            navigate('/home');
           }
           // Lanza una alerta cuando la suscripción esté próxima a vencerse o haya expirado
           switch (true) {
-            case 0 < days && days <= 5:
+            case 0 < days && days <= 5 * (isAnnualSubscription ? 12 : 1):
+
               localStorage.setItem("fullAccess", true);
               handleShowModal(`Your subscription will expire in ${days} days.`, "info");
               break;
             case days <= 0:
               localStorage.setItem("fullAccess", false);
+
               handleShowModal(`Your subscription expired. Please subscribe to gain full access.`, "warning");
+              await sendDiscountEmail(data.token)
+
               break;
             default:
               break;
@@ -129,16 +188,16 @@ const Auth = (props) => {
         }
         
       }else{
-        const daysSinceCreation= withinFreeTrial();
+        const daysSinceCreation= withinFreeTrial() * (isAnnualSubscription ? 12 : 1);
         if (daysSinceCreation > 5){
           localStorage.setItem("fullAccess", true);
           setLoading(false);
           props.updateAuth(true,data.userType,true);
-          navigate('/');
+          navigate('/home');
         }
      
         switch (true) {
-          case 0 < daysSinceCreation && daysSinceCreation <= 5:
+          case 0 < daysSinceCreation && daysSinceCreation <= 5 * (isAnnualSubscription ? 12 : 1):
             localStorage.setItem("fullAccess", true);
             handleShowModal(`Your free trial will expire in ${daysSinceCreation} days. Get a 45% discount on the subscription for your first time`);
             break;
@@ -174,7 +233,6 @@ const Auth = (props) => {
     }
   };
 
-
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
@@ -190,12 +248,21 @@ const Auth = (props) => {
       const username = event.target.username.value;
       const phone = event.target.phone.value;
       const checkbox = event.target.userType;
-      const userType = checkbox.checked ? checkbox.value : "usergeneral";
+      // const userType = checkbox.checked ? checkbox.value : "usergeneral";
+      const userType = 'childcareWorker';
       const referred_user = false;
-      console.log("el usertype es: ",userType)
- 
+      const subcription_type = "month";
+      let childcareList = []; // Valor predeterminado vacío
+      if (childcare !== null) {
+          childcareList = [childcare];
+      }
+
+      
+      
+      console.log("childcare: ", childcareList)
       try {
-        const data = await registerUser(username, email, password, phone,userType,referred_user);
+        const data = await registerUser(username, email, password, phone,userType,referred_user,subcription_type,childcareList);
+        // const data = "hola"
         setLoading(false);
         // Aquí puedes manejar la respuesta de la API después del registro
         if (data.error) {
@@ -208,6 +275,8 @@ const Auth = (props) => {
           // localStorage.setItem('token', data.token);
           setLoading(false);
           showAlert('Sign up successful, please log in');
+           // resetear el valor seleccionado en el select
+          setChildcare({value: '', label: ''});
           
         }
         event.target.reset();
@@ -286,16 +355,20 @@ const Auth = (props) => {
             </>
           )}
           {!isReset && !isLogin && (
-              <div className="checkbox-container">
-              <input
-                type="checkbox"
-                id="userType"
-                name="userType"
-                value="childcareWorker"
-                className="big-checkbox"
-              />
-              <label htmlFor="userType" className="checkbox-label">Are you a Childcare Worker?</label>
+            <div className="checkbox-container">
+             
+
+              <div className="col-12">
+                  <label htmlFor="childcare">Select your Childcare:</label>
+                  <AsyncSelect 
+                  id="childcare"
+                  loadOptions={loadOptions}
+                  onChange={selectedOption => setChildcare(selectedOption)}
+                  />
+              </div>
+            
             </div>
+            
           )}
           <button className="button-shared  auth-submit" type="submit">
             {isReset ? 'Request Reset' : (isLogin ? 'Log in' : 'Sign up')}

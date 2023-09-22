@@ -39,7 +39,6 @@ const ResetPassword = () => {
 
     try {
       const data = await resetPassword(token, newPassword);
-      console.log(data,"login")
       showAlert(data.message, 'success');
       setLoading(false);
     } catch (error) {

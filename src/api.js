@@ -3,10 +3,10 @@ import { loadStripe } from '@stripe/stripe-js';
 
 
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
-// const BASE_URL = process.env.REACT_APP_BASE_URL;
+const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 
-const BASE_URL = 'http://127.0.0.1:8000';
+// const BASE_URL = 'http://127.0.0.1:8000';
 
 
 export const submitChat = async(message, messages)=>{
@@ -241,7 +241,7 @@ export const submitSummativeAssessment= async(token, date, name, age, outCome1,o
 
 
 // request to log in and sign up
-export const registerUser = async (username, email, password, phone,userType,referred_user) => {
+export const registerUser = async (username, email, password, phone,userType,referred_user,subscription_type,childcareList) => {
   try {
 
     const response = await fetch(`${BASE_URL}/users/register/`, {
@@ -255,7 +255,9 @@ export const registerUser = async (username, email, password, phone,userType,ref
         password,
         phone,
         userType,
-        referred_user
+        referred_user,
+        subscription_type,
+        childcareList 
       }),
     });
 
@@ -287,11 +289,11 @@ export const getUser = async (token)=>{
         token
       }),
     });
-
     const data = await response.json();
-  
+
     if (response.ok) {
       return data;
+
     } else {
       // Lanza un error si el inicio de sesión no es exitoso
       const error = new Error(data.error);
@@ -303,6 +305,38 @@ export const getUser = async (token)=>{
     throw error;
   }
 }
+
+export const UpdateFieldUser = async(token, field_user,value)=>{
+  try {
+    const response = await fetch(`${BASE_URL}/users/update_field_user/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        token,
+        field_user,
+        value
+      }),
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      return data;
+    } else {
+      // Lanza un error 
+      const error = new Error(data.error);
+      error.response = response;
+      throw error;
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    throw error;
+    
+  }
+}
+
+
 export const loginUser = async (email, password) => {
   try {
     const response = await fetch(`${BASE_URL}/users/login/`, {
@@ -315,11 +349,13 @@ export const loginUser = async (email, password) => {
         password,
       }),
     });
-
+    
+    
     const data = await response.json();
       // Verificar si el inicio de sesión es exitoso
       if (response.ok) {
-        return data;
+
+        return data.data_user;
       } else {
         // Lanza un error si el inicio de sesión no es exitoso
         const error = new Error(data.error);
@@ -330,7 +366,7 @@ export const loginUser = async (email, password) => {
     console.error('Error:', error);
     throw error;
   }
-};
+}; 
 
 export const deleteUserByEmail = async (email) => {
   try {
@@ -374,6 +410,52 @@ export const updateReferralDiscount = async (token, discount) => {
   const data = await response.json();
   return data;
 }; 
+
+export const getListChildCare = async(inputValue) => {
+  const response = await fetch(`${BASE_URL}/users/get-childcare/?search=${inputValue}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  if (!response.ok) {
+    throw new Error(`Request failed with status ${response.status}`);
+  }
+  const data = await response.json();
+  return data;
+}
+
+export const updateUser = async (token, username, email, numberPhone, childcareList) => {
+  try {
+    const response = await fetch(`${BASE_URL}/users/update-user/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        token,
+        username,
+        email,
+        numberPhone,
+        childcareList
+      }),
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      return data;
+    } else {
+      // Lanza un error si la actualización no es exitosa
+      const error = new Error(data.error);
+      error.response = response;
+      throw error;
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    throw error;
+  }
+}
+
 
 // request to historical reports
 // export const submitSaveReport = async (token,typeReport,report,childName,childId,age,goalObservations) => {
@@ -563,6 +645,23 @@ export const submitFollowUp = async(token,date,name,age,goalFollowUp,description
   } 
 }
 
+export const deleteReport = async(reportId)=>{
+  try {
+    const response = await fetch(`${BASE_URL}/api/delete-report/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({reportId}),
+        });
+        const data = await response.json();
+        return data;
+  } catch (error) {
+        console.error('Error:', error);
+        throw error;
+    }
+}
+
 
 export const requestPasswordReset = async (email) => {
   const response = await fetch(`${BASE_URL}/users/request-password-reset/`, {
@@ -668,7 +767,7 @@ export const createStripeCheckoutSession = async (email) => {
 };
 
 export const paymentSubscription= async(token,email,name)=>{
-  try {
+  try { 
     const response = await fetch(`${BASE_URL}/users/payment-subscription/`, {
       method: 'POST',
       headers: {
@@ -701,6 +800,94 @@ export const updateHadSuccessfulSubscription = async(userId, hadSuccessfulSubscr
   }
 
   return await response.json();
+}
+
+export const getSubscription = async (subscriptionId)=>{
+  try {
+
+    const response = await fetch(`${BASE_URL}/users/get-subscription/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        subscriptionId
+      }),
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      return data;
+    } else {
+      // Lanza un error si el inicio de sesión no es exitoso
+      const error = new Error(data.error);
+      error.response = response;
+      throw error;
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    throw error;
+  }
+} 
+
+export const cancelSubscription = async (token, subscriptionId)=>{
+  try {
+    const response = await fetch(`${BASE_URL}/users/cancel-subscription/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        token,
+        subscriptionId
+      }),
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      return data;
+    } else {
+      // Lanza un error si el inicio de sesión no es exitoso
+      const error = new Error(data.error);
+      error.response = response;
+      throw error;
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    throw error;
+  }
+}
+
+export const updateCard = async(token,paymentMethodId, subscriptionId) =>{
+  try {
+
+    console.log(token,paymentMethodId,subscriptionId)
+    const response = await fetch(`${BASE_URL}/users/update-card/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        token,
+        paymentMethodId,
+        subscriptionId
+      }),
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      return data;
+    } else {
+      // Lanza un error si la actualización no es exitosa
+      const error = new Error(data.error);
+      error.response = response;
+      throw error;
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    throw error;
+  }
+
 }
 
 
@@ -790,6 +977,70 @@ export const getListChilds = async(token)=>{
         console.error('Error:', error);
         throw error;
       }
+}
+
+export const updateChild = async(childId,childName,childAge,childCare,tokenChildWorker) =>{
+  try {
+    const response = await fetch(`${BASE_URL}/childs/update-child/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({childId,childName,childAge,childCare,tokenChildWorker }),
+        });
+        const data = await response.json();
+        return data;
+  } catch (error) {
+        console.error('Error:', error);
+        throw error;
+    }
+}
+
+export const deleteChild = async(childId) => {
+  try {
+    const response = await fetch(`${BASE_URL}/childs/delete-child/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({childId}),
+        });
+        const data = await response.json();
+        return data;
+  } catch (error) {
+        console.error('Error:', error);
+        throw error;
+    }
+}
+
+export const UpdateAllChildren = async(childWorker_id, field_user,value)=>{
+  try {
+    const response = await fetch(`${BASE_URL}/childs/update_all_children/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        childWorker_id,
+        field_user,
+        value
+      }),
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      return data;
+    } else {
+      // Lanza un error 
+      const error = new Error(data.error);
+      error.response = response;
+      throw error;
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    throw error;
+    
+  }
 }
 
 export const submitCreateWord = async(token,selectedReports)=>{

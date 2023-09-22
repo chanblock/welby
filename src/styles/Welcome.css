@@ -1,0 +1,345 @@
+/* Home.css */
+body {
+  overflow-x: hidden;
+}
+.home-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    color: #333;
+    max-width: 100%;
+  }
+  
+  .intro-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 2rem;
+    min-height: 300px; /* Ajusta este valor según la altura deseada */
+    padding: 2rem; /* Añade algo de relleno para evitar que el texto y los demás elementos queden demasiado pegados a los bordes */
+  }
+
+  .intro-section  .lead {
+    font-size: 35px;
+    line-height: 1.5; /* Esta es una altura de línea típica, pero puedes ajustarla según tus necesidades */
+      /* Hace la letra más gruesa */
+    color: #070707; 
+  }
+  
+  .intro-section h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .home-container .intro-section p {
+    font-size: 2.8rem;
+    margin-bottom: 1rem;
+  }
+  
+  .intro-section button {
+    padding: 0.5rem 1rem;
+    border: none;
+    background-color: #534be2;
+    color: #ffffff;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .intro-section button:hover {
+    background-color: #635bff;
+  }
+  
+  .features-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .features-section h2 {
+    margin-bottom: 2rem;
+  }
+  
+  .features-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 95%;
+    gap: 2rem;
+  }
+  
+  .feature {
+    flex: 1 1 20rem;
+    border-radius: 4px;
+    padding: 1rem;
+    text-align: justify;
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
+    /* background-color: #e6f2ff, */
+    background-color: #F8F5FA; /* amarillo suave */
+  }
+  
+  .feature h4 {
+    text-align: center;
+  }
+
+  .feature h2 {
+    text-align: center;
+  }
+
+  /* @media (max-width: 767px) {
+    .features-grid {
+      flex-direction: column;
+    }
+  } */
+
+
+  
+  .subscription-section h2 {
+    width: 100%;
+    text-align: center;
+    font-size: 2rem;
+   
+  }
+
+  hr {
+    border: 0;
+    height: 1px;
+    background: #333;
+    background-image: linear-gradient(to right, #ccc, #333, #ccc);
+  }
+
+  .card-title1 {
+    font-size: 30px;
+    text-align: center;
+  }
+
+  /* Estilo para la sección list report */
+.section-list-report {
+  display: flex;
+  flex-direction: row;
+  width: 95%;
+
+}
+
+
+.section-list-report h3{
+  text-align: center;
+
+}
+.section-list-report p{
+  text-align: justify;
+
+}
+
+/* Estilo para la columna de 30% */
+.section-list-report .column-30 {
+  width: 20%;
+  padding: 0 2rem;
+
+  
+}
+
+/* Estilo para la columna de 70% */
+.section-list-report .column-70 {
+  width: 80%;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+/* Estilo para las tarjetas */
+.section-list-report .column-70 .card {
+  flex-basis: calc(25% - 20px); /* Restamos 20px para el margen */
+  margin: 0px;
+  background: white; /* fondo blanco */
+  border-radius: 5px; /* bordes suavemente redondeados */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* sombra sutil */
+  min-height: 350px;
+}
+
+.section-list-report button {
+  padding: 0.5rem 1rem;
+  border: none;
+  background-color: #534be2;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+
+.carousel {
+  margin-left: 80px;  /* Ajusta según tus necesidades */
+  margin-right: 80px; /* Ajusta según tus necesidades */
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  background-color: rgb(61, 61, 61);  /* Esto hará que las flechas sean negras */
+}
+
+.carousel-indicators .active {
+  background-color: black;  /* Reemplaza 'tuColorDeseadoParaActivo' con el color que quieras para el indicador activo */
+}
+.carousel img {
+  height: 600px;  /* Debe coincidir con la altura del contenedor del carrusel */
+  /* Esto asegura que la proporción de la imagen se mantenga */
+  margin: 0 auto;  /* Esto centra la imagen en el carrusel si es más pequeña que el contenedor */
+}
+.carousel-item {
+  display: flex;
+  align-items: center;  /* Centra verticalmente */
+  justify-content: center;  /* Centra horizontalmente */
+}
+
+
+
+.features-grid  .lead {
+  font-size: 32px;
+  line-height: 1.5; /* Esta es una altura de línea típica, pero puedes ajustarla según tus necesidades */
+    /* Hace la letra más gruesa */
+  color: #404040; 
+}
+
+@media (max-width: 768px) {
+
+  /* Estilo para la columna de 30% */
+  .section-list-report .column-30 {
+    width: 100%;
+    padding: 0 1rem;
+  }
+
+
+  /* Estilo para las tarjetas */
+  .section-list-report .column-70 .card {
+    flex-basis: 100%;
+    width: 100%;
+
+    margin: 0.5rem 0; /* Añadir un pequeño margen para separar las tarjetas cuando se apilan */
+  }
+}
+
+@media (max-width: 768px) {
+  .intro-section h1 img {
+    max-width: 105%;
+    height: auto;
+    
+  
+}
+.home-container .intro-section p {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+
+.features-grid  .lead {
+  flex-direction: column;
+  font-size: 1.5rem;
+  line-height: 1.5; /* Esta es una altura de línea típica, pero puedes ajustarla según tus necesidades */
+    /* Hace la letra más gruesa */
+ } 
+}
+div.home-container section.intro-section button.button {
+    font-size: 1rem;
+    padding: 8px 16px;
+}
+
+
+
+
+/* estilo para boton free trial de welcome.js */
+.button {
+  display: inline-block;
+  padding: 12px 28px;
+  margin: 10px;
+  font-size: 24px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #fff;
+  background-image: linear-gradient(to bottom right, #00c6ff, #0072ff);
+  border: none;
+  border-radius: 40px;
+  box-shadow: 0px 4px 0px #0072ff;
+  transition: all 0.2s ease-in-out;
+}
+
+.button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0px 6px 0px #0072ff;
+}
+
+.button:active {
+  transform: translateY(0px);
+  box-shadow: none;
+  background-image: linear-gradient(to bottom right, #0072ff, #00c6ff);
+}
+
+.button:before,
+.button:after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.button:before {
+  top: -3px;
+  left: -3px;
+  border-radius: 40px;
+  border-top: 3px solid #fff;
+  border-left: 3px solid #fff;
+}
+
+.button:after {
+  bottom: -3px;
+  right: -3px;
+  border-radius: 40px;
+  border-bottom: 3px solid #fff;
+  border-right: 3px solid #fff;
+}
+
+.custom-footer {
+  background-color: #0072ff;
+  color: #fff;
+  padding: 20px;
+  text-align: center;
+  font-size: 16px;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
+
+.leadWithBackground {
+  background-image: url('../../public/childcareWelly.png');
+  background-size: cover;
+  color: white;
+}
+
+.carousel-item img {
+  max-width: 100%;
+  height: auto;
+  transform: scale(1, 0.9);
+}
+
+
+
+@media only screen and (max-width: 767px) {
+  .carousel {
+      width: 95vw; /* Esto hará que el carrusel tenga el ancho del viewport */
+      position: relative;
+      left: 0.5%;
+      right: 1%;
+      margin-left: -30vw;
+      margin-right: -30vw;
+  }
+
+  .carousel-item img {
+    height: 70vw;
+
+  }
+}
+
+
+
+
+

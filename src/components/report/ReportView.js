@@ -132,48 +132,49 @@ const ReportView = () => {
                 )}
       </div>
       <Card className="report-card">
+      <h2 className="report-title text-center">{title}</h2>
+      <Row>
+          <Button onClick={handleGoBack} variant="link">Go Back</Button>
+          </Row>
         <Card.Body>
-          <h2 className="report-title text-center">{title}</h2>
+          
           <p className="lead text-center"> 
           { title === "Goal Report" || title === "Follow up" || title === "Descriptions Report" ?
             <><em>Child:</em><strong> {name}</strong></>: 
             null
           }
         </p>
-          <Row>
-          <Button onClick={handleGoBack} variant="link">Go Back</Button>
-          </Row>
+          
           <TextareaAutosize
             className="report-content no-scrollbar"
             value={editedContent}
             readOnly={false}
             onChange={handleContentChange}
           />
-          {/* <Button onClick={handleCopyToClipboard} className="mt-2 d-none d-md-inline-block copy-button">
-            Copy
-          </Button> */}
+          
           <br></br><br></br>
-          <Row>
-            <Col md={6}></Col>
-            <Col md={6}>
+          
+        </Card.Body>
+        <Row>
+            <Col md={8}></Col>
+            <Col md={4}>
             <Button onClick={handleGoBack} className="mt-2 d-none d-md-inline-block" variant="light">
                 Go Back
               </Button>{' '}
               <Button onClick={handleCopyToClipboard} className="mt-2 d-none d-md-inline-block" variant="primary">
                 Copy
               </Button>{' '}
-              <Button onClick={handleSaveReport} className="mt-2 d-none d-md-inline-block" variant="secondary" >
+              {/* <Button onClick={handleSaveReport} className="mt-2 d-none d-md-inline-block" variant="secondary" >
                 Save report
-              </Button>
+              </Button> */}
             </Col>
           </Row>
-        </Card.Body>
         <br></br>
         <Button onClick={handleCopyToClipboard} className="mt-2 d-inline-block d-md-none copy-button">
           Copy
         </Button>
-        <Button onClick={handleSaveReport} className="mt-2 ml-2 d-inline-block d-md-none save-report-button">
-          Save Report
+        <Button  onClick={handleGoBack} className="mt-2 d-inline-block d-md-none copy-button" variant="light">
+                  Go Back
         </Button>
       </Card>
     </Container>

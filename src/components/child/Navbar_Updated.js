@@ -7,13 +7,12 @@ import { submitGetReferralLink,getSubscription } from '../api';
 import { useChilds } from "./childcomponents/useChilds";
  
 const Navbar = (props) => {
+  const [linkKey, setLinkKey] = useState(Date.now());
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
   const username = localStorage.getItem("username");
   const userType = localStorage.getItem("userType");
   const subscription = localStorage.getItem("subscription");
-
-
   const subscriptioId = localStorage.getItem("subscription_id")
   const [subscriptionData, setSubscriptionData] = useState(null);
 
@@ -79,9 +78,7 @@ const Navbar = (props) => {
   }
 
   const handleListChilds = async() => {
-    
-    // navigate("/list-childs");
-     window.location.href = "/Welby/list-childs";
+    navigate("/list-childs");
   }
 
   const handleProfile = async() =>{

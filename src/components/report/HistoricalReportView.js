@@ -48,13 +48,16 @@ const HistoricalReportView = () => {
 
 
     return (
-        <Container>
-            <br />
+        <div className='container'>
+            
             <h2 className="report-title text-center">{title} </h2>
-            <Card className="report-card">
-                <Card.Body>
-                    <h2 className="report-title text-center">{formatTitle(type_report)}</h2>
-                    <p className="text-center"><em>{formatDate(timestamp)}</em></p>
+            <Card >
+                
+                    <h2 className=" card-title text-center">{formatTitle(type_report)}<br></br></h2>
+   
+                    <p className=" text-center"><em>{formatDate(timestamp)}</em></p>
+                    
+                    <Card.Body>
                     <TextareaAutosize
                         className="report-content no-scrollbar"
                         value={editedContent}
@@ -62,18 +65,19 @@ const HistoricalReportView = () => {
                         onChange={handleContentChange}
                     />
                     <br></br><br></br>
-                    <Row>
+                   
+                </Card.Body>
+                <Row>
                       <Col md={8}></Col>
                       <Col md={4}>
                         <Button onClick={handleGoBack} className="mt-2 d-none d-md-inline-block" variant="light">
                          Go Back
                         </Button>{' '}
                         <Button  onClick={handleCopyToClipboard} className="mt-2 d-none d-md-inline-block" variant="primary" >
-                          Copy
+                          Copy 
                         </Button>
                       </Col>
                     </Row>
-                </Card.Body>
                 <br></br>
                 <Button  onClick={handleGoBack} className="mt-2 d-inline-block d-md-none copy-button" variant="light">
                   Go Back
@@ -82,7 +86,10 @@ const HistoricalReportView = () => {
                   Copy
                 </Button>
             </Card>
-        </Container>
+ 
+            </div>
+
+        
     );
 };
 
