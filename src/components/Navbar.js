@@ -81,7 +81,7 @@ const Navbar = (props) => {
   const handleListChilds = async() => {
     
     // navigate("/list-childs");
-     window.location.href = "/Welby/list-childs";
+     window.location.href = "/welby/list-childs";
   }
 
   const handleProfile = async() =>{

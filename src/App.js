@@ -64,7 +64,7 @@ function App() {
 
   return (
     <Elements stripe={stripePromise} options={{ locale: 'en-AU' }}>
-      <Router basename="/Welby">
+      <Router basename="/welby">
         <div className="App">
         <ChildsProvider>
           <Navbar isAuthenticated={isAuthenticated} updateAuth={updateAuth} />
