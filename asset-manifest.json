@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/static/css/main.48eae259.css",
-    "main.js": "/static/js/main.3cd2dc4d.js",
+    "main.js": "/static/js/main.ce60f5ca.js",
     "static/js/787.7f63e06d.chunk.js": "/static/js/787.7f63e06d.chunk.js",
     "static/media/childcareWelly.png": "/static/media/childcareWelly.1133fe908eba7224b6e8.png",
     "index.html": "/index.html",
     "main.48eae259.css.map": "/static/css/main.48eae259.css.map",
-    "main.3cd2dc4d.js.map": "/static/js/main.3cd2dc4d.js.map",
+    "main.ce60f5ca.js.map": "/static/js/main.ce60f5ca.js.map",
     "787.7f63e06d.chunk.js.map": "/static/js/787.7f63e06d.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.48eae259.css",
-    "static/js/main.3cd2dc4d.js"
+    "static/js/main.ce60f5ca.js"
   ]
 }
