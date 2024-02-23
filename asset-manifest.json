@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.55891265.css",
-    "main.js": "/static/js/main.ad735e12.js",
+    "main.css": "/static/css/main.9eee3d90.css",
+    "main.js": "/static/js/main.0d3376ff.js",
     "pdfmake.js": "/static/js/pdfmake.90eef773.chunk.js",
     "canvg.js": "/static/js/canvg.2f38d4b7.chunk.js",
     "xlsx.js": "/static/js/xlsx.f6d4f08e.chunk.js",
@@ -13,16 +13,17 @@
     "static/media/background2.png": "/static/media/background2.f4ca93f8b813378f682a.png",
     "static/media/background1.png": "/static/media/background1.ab14a65e51a3eb3e782b.png",
     "static/media/childcareWelly.png": "/static/media/childcareWelly.1133fe908eba7224b6e8.png",
+    "static/media/background.png": "/static/media/background.41b7d59e79849148836b.png",
     "index.html": "/index.html",
-    "main.55891265.css.map": "/static/css/main.55891265.css.map",
-    "main.ad735e12.js.map": "/static/js/main.ad735e12.js.map",
+    "main.9eee3d90.css.map": "/static/css/main.9eee3d90.css.map",
+    "main.0d3376ff.js.map": "/static/js/main.0d3376ff.js.map",
     "pdfmake.90eef773.chunk.js.map": "/static/js/pdfmake.90eef773.chunk.js.map",
     "canvg.2f38d4b7.chunk.js.map": "/static/js/canvg.2f38d4b7.chunk.js.map",
     "xlsx.f6d4f08e.chunk.js.map": "/static/js/xlsx.f6d4f08e.chunk.js.map",
     "787.7f63e06d.chunk.js.map": "/static/js/787.7f63e06d.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.55891265.css",
-    "static/js/main.ad735e12.js"
+    "static/css/main.9eee3d90.css",
+    "static/js/main.0d3376ff.js"
   ]
 }
